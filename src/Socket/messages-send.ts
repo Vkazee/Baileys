@@ -1030,6 +1030,22 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				;(stanza.content as BinaryNode[]).push(...additionalNodes)
 			}
 
+			// inject biz node untuk interactive/button/list message
+			if (!isNewsletter) {
+				const normalizedMsg = normalizeMessageContent(message)
+				const hasButton =
+					normalizedMsg?.interactiveMessage ||
+					normalizedMsg?.buttonsMessage ||
+					normalizedMsg?.listMessage
+
+				if (hasButton) {
+					const buttonsNode = getButtonArgs(normalizedMsg!)
+					if (buttonsNode) {
+						;(stanza.content as BinaryNode[]).push(buttonsNode)
+					}
+				}
+			}
+
 			logger.debug({ msgId }, `sending message to ${participants.length} devices`)
 
 			await sendNode(stanza)
@@ -1105,6 +1121,104 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		}
 
 		return ''
+	}
+
+	const getButtonArgs = (message: proto.IMessage): BinaryNode | undefined => {
+		const nativeFlow = message?.interactiveMessage?.nativeFlowMessage
+		const firstButtonName = nativeFlow?.buttons?.[0]?.name as string | undefined
+
+		const nativeFlowSpecials = [
+			'mpm', 'cta_catalog', 'send_location',
+			'call_permission_request', 'wa_payment_transaction_details',
+			'automated_greeting_message_view_catalog'
+		]
+
+		if (nativeFlow && (firstButtonName === 'review_and_pay' || firstButtonName === 'payment_info')) {
+			return {
+				tag: 'biz',
+				attrs: {
+					native_flow_name: firstButtonName === 'review_and_pay' ? 'order_details' : firstButtonName
+				}
+			}
+		} else if (nativeFlow && nativeFlowSpecials.includes(firstButtonName!)) {
+			return {
+				tag: 'biz',
+				attrs: {
+					actual_actors: '2',
+					host_storage: '2',
+					privacy_mode_ts: unixTimestampSeconds().toString()
+				},
+				content: [
+					{
+						tag: 'interactive',
+						attrs: { type: 'native_flow', v: '1' },
+						content: [
+							{
+								tag: 'native_flow',
+								attrs: { v: '2', name: firstButtonName! }
+							}
+						]
+					},
+					{
+						tag: 'quality_control',
+						attrs: { source_type: 'third_party' }
+					}
+				]
+			}
+		} else if (nativeFlow || message?.buttonsMessage) {
+			return {
+				tag: 'biz',
+				attrs: {
+					actual_actors: '2',
+					host_storage: '2',
+					privacy_mode_ts: unixTimestampSeconds().toString()
+				},
+				content: [
+					{
+						tag: 'interactive',
+						attrs: { type: 'native_flow', v: '1' },
+						content: [
+							{
+								tag: 'native_flow',
+								attrs: { v: '9', name: 'mixed' }
+							}
+						]
+					},
+					{
+						tag: 'quality_control',
+						attrs: { source_type: 'third_party' }
+					}
+				]
+			}
+		} else if (message?.listMessage) {
+			return {
+				tag: 'biz',
+				attrs: {
+					actual_actors: '2',
+					host_storage: '2',
+					privacy_mode_ts: unixTimestampSeconds().toString()
+				},
+				content: [
+					{
+						tag: 'list',
+						attrs: { v: '2', type: 'product_list' }
+					},
+					{
+						tag: 'quality_control',
+						attrs: { source_type: 'third_party' }
+					}
+				]
+			}
+		} else {
+			return {
+				tag: 'biz',
+				attrs: {
+					actual_actors: '2',
+					host_storage: '2',
+					privacy_mode_ts: unixTimestampSeconds().toString()
+				}
+			}
+		}
 	}
 
 	const getPrivacyTokens = async (jids: string[]) => {
