@@ -1030,7 +1030,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				;(stanza.content as BinaryNode[]).push(...additionalNodes)
 			}
 
-			// inject biz node untuk interactive/button/list message
+			// Inject biz node for interactive, button, and list messages
 			if (!isNewsletter) {
 				const normalizedMsg = normalizeMessageContent(message)
 				const hasButton =
