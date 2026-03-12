@@ -1,5 +1,16 @@
 <h1><img alt="Baileys logo" src="https://raw.githubusercontent.com/WhiskeySockets/Baileys/refs/heads/master/Media/logo.png" height="75"/></h1>
 
+---
+
+## About This Fork
+
+This is a lightweight fork of WhiskeySockets/Baileys. It is kept in sync with the upstream version, with only one specific enhancement:
+
+- **Button Message Support:** Restored the ability to send and receive interactive buttons.
+
+Everything else remains identical to the original repository.
+
+---
 
 > [!CAUTION]
 > NOTICE OF BREAKING CHANGE.
