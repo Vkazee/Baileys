@@ -267,6 +267,8 @@ export type AnyRegularMessageContent = (
 	  }
 	| SharePhoneNumber
 	| RequestPhoneNumber
+	| { groupStatusMessageV2: proto.Message.IFutureProofMessage }
+	| { groupStatusMessage: proto.Message.IFutureProofMessage }
 ) &
 	ViewOnce
 

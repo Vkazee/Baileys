@@ -631,6 +631,28 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		useUserDevicesCache = useUserDevicesCache !== false
 		useCachedGroupMetadata = useCachedGroupMetadata !== false && !isStatus
 
+		// Ensure groupStatusMessageV2 always has messageContextInfo.messageSecret
+		if (message?.groupStatusMessageV2 && !message?.messageContextInfo?.messageSecret) {
+			const { randomBytes } = await import('node:crypto')
+			message = {
+				...message,
+				messageContextInfo: {
+					...(message.messageContextInfo || {}),
+					messageSecret: randomBytes(32)
+				},
+				groupStatusMessageV2: {
+					...message.groupStatusMessageV2,
+					message: {
+						...(message.groupStatusMessageV2.message || {}),
+						messageContextInfo: {
+							...(message.groupStatusMessageV2.message?.messageContextInfo || {}),
+							messageSecret: message.messageContextInfo?.messageSecret || randomBytes(32)
+						}
+					}
+				}
+			}
+		}
+
 		const participants: BinaryNode[] = []
 		const destinationJid = !isStatus ? finalJid : statusJid
 		const binaryNodeContent: BinaryNode[] = []
@@ -1060,6 +1082,12 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 	}
 
 	const getMessageType = (message: proto.IMessage) => {
+		// groupStatusMessageV2 must be checked BEFORE normalizeMessageContent
+		// because normalizeMessageContent will unwrap it into the inner message
+		if (message?.groupStatusMessageV2 || message?.groupStatusMessage) {
+			return 'text'
+		}
+
 		const normalizedMessage = normalizeMessageContent(message)
 		if (!normalizedMessage) return 'text'
 

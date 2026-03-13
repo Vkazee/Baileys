@@ -601,6 +601,10 @@ export const generateWAMessageContent = async (
 				initiatedByMe: true
 			}
 		}
+	} else if (hasNonNullishProperty(message, 'groupStatusMessageV2')) {
+		m.groupStatusMessageV2 = message.groupStatusMessageV2
+	} else if (hasNonNullishProperty(message, 'groupStatusMessage')) {
+		m.groupStatusMessage = message.groupStatusMessage
 	} else {
 		m = await prepareWAMessageMedia(message, options)
 	}
