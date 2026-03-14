@@ -4,9 +4,10 @@
 
 ## About This Fork
 
-This is a lightweight fork of WhiskeySockets/Baileys. It is kept in sync with the upstream version, with only one specific enhancement:
+This is a lightweight fork of [WhiskeySockets/Baileys](https://github.com/WhiskeySockets/Baileys), kept in sync with upstream. The following enhancements have been added:
 
-- **Button Message Support:** Restored the ability to send and receive interactive buttons.
+- **Interactive Message Support:** Restored the ability to send and receive interactive buttons, lists, and CTA URL messages.
+- **Group Status Support:** Added `groupStatusMessageV2` support for sending stories/status directly to group chats.
 
 Everything else remains identical to the original repository.
 
