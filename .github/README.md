@@ -8,6 +8,7 @@ This is a lightweight fork of [WhiskeySockets/Baileys](https://github.com/Whiske
 
 - **Interactive Message Support:** Restored the ability to send and receive interactive buttons, lists, and CTA URL messages.
 - **Group Status Support:** Added `groupStatusMessageV2` support for sending stories/status directly to group chats.
+- **Album messaging:** Send grouped media messages with expected image and video counts.
 
 Everything else remains identical to the original repository.
 
