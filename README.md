@@ -1,7 +1,20 @@
-<h1 align='center'><img alt="Baileys logo" src="https://raw.githubusercontent.com/WhiskeySockets/Baileys/refs/heads/master/Media/logo.png" height="75"/></h1>
+<p align="center"><img src="https://raw.githubusercontent.com/Vkazee/Baileys/refs/heads/master/Media/logo.png" alt="Baileys logo" height="150"></p>
 
 <div align='center'>Baileys is a WebSockets-based TypeScript library for interacting with the WhatsApp Web API.</div>
 
+---
+
+## About This Fork
+
+This is a lightweight fork of [WhiskeySockets/Baileys](https://github.com/WhiskeySockets/Baileys), kept in sync with upstream. The following enhancements have been added:
+
+- **Interactive Message Support:** Restored the ability to send and receive interactive buttons, lists, and CTA URL messages.
+- **Group Status Support:** Added `groupStatusMessageV2` support for sending stories/status directly to group chats.
+- **Album Message Support:** Send grouped media messages with expected image and video counts.
+
+Everything else remains identical to the original repository.
+
+---
 
 > [!CAUTION]
 > NOTICE OF BREAKING CHANGE.
@@ -14,15 +27,6 @@
 This is a temporary README.md, the new guide is in development and will this file will be replaced with .github/README.md (already a default on GitHub).
 
 New guide link: https://baileys.wiki
-
-# Get Support
-
-If you'd like business to enterprise-level support from Rajeh, the current maintainer of Baileys, you can book a video chat. Book a 1 hour time slot by contacting him on Discord or pre-ordering [here](https://purpshell.dev/book). The earlier you pre-order the better, as his time slots usually fill up very quickly. He offers immense value per hour and will answer all your questions before the time runs out.
-
-If you are a business, we encourage you to contribute back to the high development costs of the project and to feed the maintainers who dump tens of hours a week on this. You can do so by booking meetings or sponsoring below. All support, even in bona fide / contribution hours, is welcome by businesses of all sizes. This is not condoning or endorsing businesses to use the library. See the Disclaimer below.
-
-# Sponsor
-If you'd like to financially support this project, you can do so by supporting the current maintainer [here](https://purpshell.dev/sponsor).
 
 # Disclaimer
 This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with WhatsApp or any of its subsidiaries or its affiliates.
@@ -41,7 +45,6 @@ Use at your own discretion. Do not spam people with this. We discourage any stal
 > [!IMPORTANT]
 > The original repository had to be removed by the original author - we now continue development in this repository here.
 This is the only official repository and is maintained by the community.
-> **Join the Discord [here](https://discord.gg/WeJM5FP9GG)**
 
 ## Example
 
@@ -56,17 +59,17 @@ To run the example script, download or clone the repo and then type the followin
 
 Use the stable version:
 ```
-yarn add @whiskeysockets/baileys
+yarn add @vkazee/baileys
 ```
 
 Use the edge version (no guarantee of stability, but latest fixes + features)
 ```
-yarn add github:WhiskeySockets/Baileys
+yarn add github:Vkazee/Baileys
 ```
 
 Then import your code using:
 ```ts
-import makeWASocket from '@whiskeysockets/baileys'
+import makeWASocket from '@vkazee/baileys'
 ```
 
 # Links
@@ -98,18 +101,21 @@ import makeWASocket from '@whiskeysockets/baileys'
         - [Text Message](#text-message)
         - [Quote Message](#quote-message-works-with-all-types)
         - [Mention User](#mention-user-works-with-most-types)
+        - [Mention All](#mention-all-group-only)
         - [Forward Messages](#forward-messages)
         - [Location Message](#location-message)
         - [Contact Message](#contact-message)
         - [Reaction Message](#reaction-message)
         - [Pin Message](#pin-message)
         - [Poll Message](#poll-message)
+        - [Interactive Message](#interactive-message)
     - [Sending with Link Preview](#sending-messages-with-link-previews)
     - [Media Messages](#media-messages)
         - [Gif Message](#gif-message)
         - [Video Message](#video-message)
         - [Audio Message](#audio-message)
         - [Image Message](#image-message)
+        - [Album Message](#album-message)
         - [ViewOnce Message](#view-once-message)
 - [Modify Messages](#modify-messages)
     - [Delete Messages (for everyone)](#deleting-messages-for-everyone)
@@ -173,6 +179,7 @@ import makeWASocket from '@whiskeysockets/baileys'
     - [Update Default Disappearing Mode](#update-default-disappearing-mode)
 - [Broadcast Lists & Stories](#broadcast-lists--stories)
     - [Send Broadcast & Stories](#send-broadcast--stories)
+    - [Send Group Status (Story to Group)](#send-group-status-story-to-group)
     - [Query a Broadcast List's Recipients & Name](#query-a-broadcast-lists-recipients--name)
 - [Writing Custom Functionality](#writing-custom-functionality)
     - [Enabling Debug Level in Baileys Logs](#enabling-debug-level-in-baileys-logs)
@@ -195,7 +202,7 @@ WhatsApp provides a multi-device API that allows Baileys to be authenticated as 
 > You can customize browser name if you connect with **QR-CODE**, with `Browser` constant, we have some browsers config, **see [here](https://baileys.whiskeysockets.io/types/BrowsersMap.html)**
 
 ```ts
-import makeWASocket from '@whiskeysockets/baileys'
+import makeWASocket from '@vkazee/baileys'
 
 const sock = makeWASocket({
     // can provide additional config here
@@ -215,7 +222,7 @@ If the connection is successful, you will see a QR code printed on your terminal
 The phone number can't have `+` or `()` or `-`, only numbers, you must provide country code
 
 ```ts
-import makeWASocket from '@whiskeysockets/baileys'
+import makeWASocket from '@vkazee/baileys'
 
 const sock = makeWASocket({
     // can provide additional config here
@@ -288,7 +295,7 @@ You obviously don't want to keep scanning the QR code every time you want to con
 
 So, you can load the credentials to log back in:
 ```ts
-import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys'
+import makeWASocket, { useMultiFileAuthState } from '@vkazee/baileys'
 
 const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys')
 
@@ -331,7 +338,7 @@ sock.ev.on('messages.upsert', ({ messages }) => {
 > For reliable serialization of the authentication state, especially when storing as JSON, always use the BufferJSON utility.
 
 ```ts
-import makeWASocket, { DisconnectReason, useMultiFileAuthState } from '@whiskeysockets/baileys'
+import makeWASocket, { DisconnectReason, useMultiFileAuthState } from '@vkazee/baileys'
 import { Boom } from '@hapi/boom'
 
 async function connectToWhatsApp () {
@@ -413,7 +420,7 @@ sock.ev.on('messages.update', event => {
 It can be used as follows:
 
 ```ts
-import makeWASocket, { makeInMemoryStore } from '@whiskeysockets/baileys'
+import makeWASocket, { makeInMemoryStore } from '@vkazee/baileys'
 // the store maintains the data of the WA connection in memory
 // can be written out to a file & read from it
 const store = makeInMemoryStore({ })
@@ -496,6 +503,26 @@ await sock.sendMessage(
     }
 )
 ```
+
+#### Mention All (group only)
+- Mention all members of a group without listing individual JIDs. WhatsApp renders this as an "@all" mention.
+```ts
+await sock.sendMessage(jid, {
+    text: '@all Hello!',
+    mentionAll: true,
+})
+```
+- Can be combined with `mentions` to tag specific users at the same time:
+```ts
+await sock.sendMessage(jid, {
+    text: '@all and @628123456789 please read this.',
+    mentionAll: true,
+    mentions: ['628123456789@s.whatsapp.net'],
+})
+```
+
+> [!NOTE]
+> `mentionAll` works on any message type that supports `contextInfo` (text, image, video, etc.). It has no effect outside of group chats.
 
 #### Forward Messages
 - You need to have message object, can be retrieved from [store](#implementing-a-data-store) or use a [message](https://baileys.whiskeysockets.io/types/WAMessage.html) object
@@ -589,6 +616,98 @@ await sock.sendMessage(
 )
 ```
 
+#### Interactive Message
+- Interactive messages are sent using `generateWAMessageFromContent` + `proto.Message.InteractiveMessage.create()` then relayed via `sock.relayMessage`.
+
+**Quick Reply Buttons (with image header):**
+```ts
+const { prepareWAMessageMedia, generateWAMessageFromContent, proto } = await import('@vkazee/baileys')
+
+const msg = generateWAMessageFromContent(jid, {
+    viewOnceMessage: {
+        message: {
+            messageContextInfo: {
+                deviceListMetadata: {},
+                deviceListMetadataVersion: 2,
+            },
+            interactiveMessage: proto.Message.InteractiveMessage.create({
+                body: proto.Message.InteractiveMessage.Body.create({
+                    text: 'Hello, this is the message body',
+                }),
+                footer: proto.Message.InteractiveMessage.Footer.create({
+                    text: 'Footer text here',
+                }),
+                header: proto.Message.InteractiveMessage.Header.create({
+                    title: 'Header Title',
+                    subtitle: '',
+                    hasMediaAttachment: true,
+                    ...(await prepareWAMessageMedia(
+                        { image: { url: './Media/ma_img.png' } },
+                        { upload: sock.waUploadToServer }
+                    )),
+                }),
+                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                    buttons: [
+                        {
+                            name: 'quick_reply',
+                            buttonParamsJson: JSON.stringify({ display_text: 'Option A', id: 'opt_a' }),
+                        },
+                        {
+                            name: 'quick_reply',
+                            buttonParamsJson: JSON.stringify({ display_text: 'Option B', id: 'opt_b' }),
+                        },
+                    ],
+                }),
+            }),
+        },
+    },
+}, { quoted: quotedMessage })
+
+await sock.relayMessage(msg.key.remoteJid, msg.message, { messageId: msg.key.id })
+```
+
+**CTA URL Button:**
+```ts
+nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+    buttons: [
+        {
+            name: 'cta_url',
+            buttonParamsJson: JSON.stringify({
+                display_text: 'Open',
+                url: 'https://example.com',
+                merchant_url: 'https://example.com',
+            }),
+        },
+    ],
+})
+```
+
+**List / Single Select:**
+```ts
+nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+    buttons: [
+        {
+            name: 'single_select',
+            buttonParamsJson: JSON.stringify({
+                title: 'Menu',
+                sections: [
+                    {
+                        title: 'Food',
+                        rows: [
+                            { header: 'Burger', title: 'Classic Burger', id: 'burger' },
+                            { header: 'Pizza', title: 'Margherita', id: 'pizza' },
+                        ],
+                    },
+                ],
+            }),
+        },
+    ],
+})
+```
+
+> [!NOTE]
+> Interactive messages are only supported in non-newsletter chats. The `biz` stanza is injected automatically by this fork.
+
 ### Sending Messages with Link Previews
 
 1. By default, wa does not have link generation when sent from the web
@@ -599,7 +718,7 @@ await sock.sendMessage(
 await sock.sendMessage(
     jid,
     {
-        text: 'Hi, this was sent using https://github.com/whiskeysockets/baileys'
+        text: 'Hi, this was sent using https://github.com/Vkazee/Baileys'
     }
 )
 ```
@@ -680,6 +799,41 @@ await sock.sendMessage(
 )
 ```
 
+#### Album Message
+- Send a group of images and/or videos as a single album. Two steps are required: first send the album container, then send each media item referencing its key.
+
+**Step 1 — Send the album container:**
+```ts
+const albumMsg = await sock.sendMessage(jid, {
+    album: {
+        expectedImageCount: 2,
+        expectedVideoCount: 1,
+    },
+})
+```
+
+**Step 2 — Send each media item with `albumParentKey`:**
+```ts
+await sock.sendMessage(jid, {
+    image: { url: './photo1.jpg' },
+    caption: 'First photo',
+    albumParentKey: albumMsg.key,
+})
+
+await sock.sendMessage(jid, {
+    image: { url: './photo2.jpg' },
+    albumParentKey: albumMsg.key,
+})
+
+await sock.sendMessage(jid, {
+    video: { url: './clip.mp4' },
+    albumParentKey: albumMsg.key,
+})
+```
+
+> [!NOTE]
+> `albumParentKey` links each media to the parent container. Supported media types are `image` and `video`.
+
 #### View Once Message
 
 - You can send all messages above as `viewOnce`, you only need to pass `viewOnce: true` in content object
@@ -729,7 +883,7 @@ await sock.sendMessage(jid, {
 If you want to save the media you received
 ```ts
 import { createWriteStream } from 'fs'
-import { downloadMediaMessage, getContentType } from '@whiskeysockets/baileys'
+import { downloadMediaMessage, getContentType } from '@vkazee/baileys'
 
 sock.ev.on('messages.upsert', async ({ [m] }) => {
     if (!m.message) return // if there is no text or media message
@@ -1217,6 +1371,45 @@ const bList = await sock.getBroadcastListInfo('1234@broadcast')
 console.log (`list name: ${bList.name}, recps: ${bList.recipients}`)
 ```
 
+### Send Group Status (Story to Group)
+- Send a status/story directly into a group chat using `groupStatusMessageV2`. A `messageSecret` is injected automatically if not provided.
+
+**Text story:**
+```ts
+await sock.sendMessage(jid, {
+    groupStatusMessageV2: {
+        message: {
+            extendedTextMessage: {
+                text: 'Hello from group status!',
+            },
+        },
+    },
+})
+```
+
+**Image story:**
+```ts
+await sock.sendMessage(jid, {
+    groupStatusMessageV2: {
+        message: {
+            imageMessage: {
+                url: 'https://mmg.whatsapp.net/...',
+                mimetype: 'image/jpeg',
+                caption: 'Group banner',
+                fileSha256: Buffer.from('...', 'base64'),
+                fileLength: imageBuffer.length,
+                mediaKey: Buffer.from('...', 'base64'),
+                fileEncSha256: Buffer.from('...', 'base64'),
+                directPath: '/v/...',
+            },
+        },
+    },
+})
+```
+
+> [!NOTE]
+> Use `groupStatusMessage` instead of `groupStatusMessageV2` only for legacy compatibility. `groupStatusMessageV2` is the recommended variant.
+
 ## Writing Custom Functionality
 Baileys is written with custom functionality in mind. Instead of forking the project & re-writing the internals, you can simply write your own extensions.
 
@@ -1289,6 +1482,7 @@ sock.ws.on('CB:edge_routing,id:abcd,routing_info', (node: BinaryNode) => { })
 
 # License
 Copyright (c) 2025 Rajeh Taher/WhiskeySockets
+Copyright (c) 2026 Vkazee (https://github.com/vkazee)
 
 Licensed under the MIT License:
 Permission is hereby granted, free of charge, to any person obtaining a copy
